@@ -32,5 +32,5 @@ class TestParseArgs(unittest.TestCase):
         print(self.args.dbfile)
 
     def test_keyword(self):
-        print(self.args.key)
+        print(self.args.keyword)
 
