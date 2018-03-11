@@ -27,12 +27,12 @@ spider.py -u url -d deep -f logfile -l loglevel(1-5)  --testself -thread number 
 
 ## 提示
 
-提示1：使用 re、urllib/urllib2、beautifulsoup/lxml2、threading、optparse、Queue、sqlite3、logger、doctest 等模块
-提示2：注意是“线程池”而不仅仅是多线程
-提示3：爬取 sina.com.cn 或其它你喜欢的目标网站，要求两级深度要能正常结束
++ 提示1：使用 re、urllib/urllib2、beautifulsoup/lxml2、threading、optparse、Queue、sqlite3、logger、doctest 等模块
++ 提示2：注意是“线程池”而不仅仅是多线程
++ 提示3：爬取 sina.com.cn 或其它你喜欢的目标网站，要求两级深度要能正常结束
 
 建议程序可分阶段，逐步完成编写，例如：
-版本1：spider1.py -u url -d deep
-版本2：spider3.py -u url -d deep -f logfile -l loglevel(1-5)  --testself
-版本3：spider3.py -u url -d deep -f logfile -l loglevel(1-5)  --testself -thread number
-版本4：剩下所有功能
++ 版本1：spider1.py -u url -d deep
++ 版本2：spider3.py -u url -d deep -f logfile -l loglevel(1-5)  --testself
++ 版本3：spider3.py -u url -d deep -f logfile -l loglevel(1-5)  --testself -thread number
++ 版本4：剩下所有功能
