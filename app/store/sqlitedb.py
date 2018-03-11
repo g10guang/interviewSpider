@@ -19,6 +19,7 @@ class SqliteStore:
         self.c = self.conn.cursor()
         self.table_name = 'spider'
         self.create_table()
+        print('数据将保存在 {} sqlite3 中'.format(self.table_name))
 
     def batch_insert(self, data: list):
         """

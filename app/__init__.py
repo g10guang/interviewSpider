@@ -35,6 +35,7 @@ def logging_config(logfile, level):
                         datefmt='%Y-%m-%d %H:%M:%S')
     logging.info('config logging finished.')
     logging.getLogger().setLevel(loglevel.get(level, logging.INFO))
+    print('爬虫日志保存在 {} 中'.format(logfile))
 
 
 parser = parse.ParseArgs()

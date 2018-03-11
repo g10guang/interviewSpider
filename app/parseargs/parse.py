@@ -22,11 +22,11 @@ class ParseArgs:
         :return:
         """
         parser = argparse.ArgumentParser(description='网络爬虫')
-        parser.add_argument('-u', dest='url', default='http://g10guang.com/', metavar='http://g10guang.com', type=str, help='输入爬取的网站的 url')
+        parser.add_argument('-u', dest='url', default='http://skoo.me/', metavar='http://g10guang.com', type=str, help='输入爬取的网站的 url')
         parser.add_argument('-f', dest='logfile', default='./spider.log', metavar='log.txt', type=str,
                             help='日志输出文件')
-        parser.add_argument('-l', dest='loglevel', default=1, metavar='[1,5]', type=int, help='日志等级')
-        parser.add_argument('--testself', dest='testself', action='store_const', const=True, default=True, help='自测试')
+        parser.add_argument('-l', dest='loglevel', default=2, metavar='[1,5]', type=int, help='日志等级')
+        parser.add_argument('--testself', dest='testself', action='store_const', const=True, default=False, help='自测试')
         parser.add_argument('-thread', dest='thread', default=10, metavar='10', type=int, help='线程池大小')
         parser.add_argument('-dbfile', dest='dbfile', metavar='./spider.db', default='spider.db', type=str,
                             help='sqlite3 数据保存文件')

@@ -35,6 +35,7 @@ class Spider:
         self.url_with_keyword = dict()
         self._thread_pool = ThreadPool(args.thread, fn=self.analyse)
         self._thread_pool.submit((base_url, 0))
+        self.linked_discovered = {self.url}
         logging.debug('start Spider base_url={} keyword={} max_depth={}'.format(self.url, self.keyword, self.keyword,
                                                                                 self.max_depth))
 
@@ -172,9 +173,8 @@ class Spider:
         new_task_list = []
         for link in links:
             if link.startswith(self.url):  # 只搜索同一个域下的内容
-                if link not in self.url_visiting and link not in self.analysed_url:
-                    # 提交到队列中
-                    # self._thread_pool.submit((link, level))
+                if link not in self.linked_discovered:
+                    self.linked_discovered.add(link)
                     new_task_list.append((link, level))
         if new_task_list:
             self._thread_pool.batch_submit(new_task_list)
