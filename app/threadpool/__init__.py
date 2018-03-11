@@ -43,6 +43,18 @@ class ThreadPool:
         self._mutex.release()
         self.task_queue.put(task)
 
+    def batch_submit(self, task_list: list):
+        """
+        批量提交任务，防止多次提交 submit，多次申请释放锁的耗时
+        :return:
+        """
+        self._mutex.acquire()
+        self._task_num += len(task_list)
+        self._mutex.release()
+        for task in task_list:
+            self.task_queue.put(task)
+            logging.debug('No.{} new task {}'.format(self._task_num, task))
+
     def shutdown(self):
         """
         等待所有线程执行的任务完成
@@ -74,6 +86,13 @@ class ThreadPool:
         self._task_finished += 1
         logging.debug('finish No.{} task'.format(self._task_finished))
         self._mutex.release()
+
+    def progress(self) -> tuple:
+        """
+        反馈进度消息，这里的进度消息不保证可靠
+        :return:
+        """
+        return self._task_finished, self._task_num
 
 
 class Worker(threading.Thread):

@@ -6,15 +6,24 @@ import time
 from app import args
 from app.spider import spider
 from app.store import sqlitedb
+import logging
 
 
 def startup():
     db = sqlitedb.SqliteStore(args.dbfile)
     spiderman = spider.Spider(args.url, args.keyword, args.depth, db)
-    sleep_time = 10
+    print('开始爬取 {} ......\n'.format(args.url))
+    sleep_time = args.flush
     # 此后将 main-Thread 设置为每 10s 刷新控制台进度消息
     while not spiderman.has_finished():
+        print(end='\r')
+        finish, total = spiderman.progress()
+        print('已完成：{} 已发现：{} 百分比：{}'.format(finish, total, finish / total), end='', flush=True)
         time.sleep(sleep_time)
+    finish, total = spiderman.progress()
+    print('\n已完成：{} 已发现：{} 百分比：{}'.format(finish, total, finish / total), end='', flush=True)
+    print('\nfinish')
+    logging.debug('spider exit')
 
 
 if __name__ == '__main__':

@@ -1,0 +1,1 @@
+http://sports.qq.com/nba/ without 标准 <base href=""> tag

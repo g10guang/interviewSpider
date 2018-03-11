@@ -30,7 +30,7 @@ class SqliteStore:
             self.c.executemany(
                 '''INSERT INTO {table_name} (keyword, url) VALUES (?, ?)'''.format(table_name=self.table_name), data)
             self.persist()
-            logging.debug('batch insert {} into {}'.format(data, self.table_name))
+            logging.info('batch insert {} into {} {} items'.format(data, self.table_name, len(data)))
         else:
             logging.error('batch insert {} into db file. Its format is invalid'.format(data))
 
@@ -45,7 +45,7 @@ class SqliteStore:
             self.c.execute(
                 '''INSERT INTO {table_name} (keyword, url) VALUES (?, ?)'''.format(table_name=self.table_name), *data)
             self.persist()
-            logging.debug('single insert {} into {}'.format(data, self.table_name))
+            logging.info('single insert {} into {}'.format(data, self.table_name))
         else:
             logging.error('single insert {} into db file. Its format is invalid'.format(data))
 

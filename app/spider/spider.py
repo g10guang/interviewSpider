@@ -5,6 +5,7 @@
 import threading
 
 import requests
+# from app.spider.requests_html import HTMLSession, HTMLResponse
 from requests_html import HTMLSession, HTMLResponse
 
 from app import args
@@ -34,7 +35,8 @@ class Spider:
         self.url_with_keyword = dict()
         self._thread_pool = ThreadPool(args.thread, fn=self.analyse)
         self._thread_pool.submit((base_url, 0))
-        logging.debug('start Spider base_url={} keyword={} max_depth={}'.format(self.url, self.keyword, self.keyword, self.max_depth))
+        logging.debug('start Spider base_url={} keyword={} max_depth={}'.format(self.url, self.keyword, self.keyword,
+                                                                                self.max_depth))
 
     def analyse(self, task):
         """
@@ -59,7 +61,7 @@ class Spider:
             content_type = self.content_type(response)
             logging.debug('{} GET Content-Type={}'.format(url, content_type))
             # 目前仅仅支持 html
-            if '/html' in content_type:
+            if 'text/html' in content_type:
                 has_key = self.has_keyword(response)
                 if has_key:
                     try:
@@ -70,8 +72,10 @@ class Spider:
                         logging.error(e)
                     finally:
                         self._mutex.release()
+
                 links = self.extract_link(response)
-                self.submit_links2queue(links, level + 1)
+                if links:
+                    self.submit_links2queue(links, level + 1)
             else:
                 logging.warning('url {} Content-Type={} not supported'.format(url, content_type))
         finally:
@@ -91,9 +95,8 @@ class Spider:
             if url not in self.url_visiting and url not in self.analysed_url:
                 self.url_visiting[url] = level
                 flag = True
-        except Exception:
-            # TODO 日志报告错误
-            pass
+        except Exception as e:
+            logging.error(e)
         finally:
             self._mutex.release()
         return flag
@@ -120,10 +123,14 @@ class Spider:
         提取 html 中的链接，需要分析相对链接和绝对链接
         :return:
         """
-        relative_links = r.html.links - r.html.absolute_links
-        all_links = r.html.absolute_links | self.relative2absolute(relative_links, r.html.base_url)
-        logging.info('links {} in url {}'.format(all_links, r.url))
-        return all_links
+        try:
+            # requests_html 库会将相对路径等也转化为绝对路径
+            absolute_links = r.html.absolute_links
+        except KeyError:
+            logging.warning('url {} html without correct <base> tag'.format(r.url))
+            absolute_links = set()
+        logging.info('links {} in url {}'.format(absolute_links, r.url))
+        return absolute_links
 
     def relative2absolute(self, relative_links, base_url):
         """
@@ -155,12 +162,8 @@ class Spider:
         :param r:
         :return:
         """
-        text = ''
-        try:
-            # 这里的 text 已经把 title 给包含了
-            text = r.html.text
-        except Exception as e:
-            logging.error(e)
+        # 这里的 text 已经把 title 给包含了
+        text = r.html.full_text
         return text
 
     def submit_links2queue(self, links, level):
@@ -173,11 +176,15 @@ class Spider:
         if level > self.max_depth:
             logging.debug('links {} beyond max_depth={}'.format(links, level))
             return
+        new_task_list = []
         for link in links:
-            if link.startswith(self.url):   # 只搜索同一个域下的内容
+            if link.startswith(self.url):  # 只搜索同一个域下的内容
                 if link not in self.url_visiting and link not in self.analysed_url:
                     # 提交到队列中
-                    self._thread_pool.submit((link, level))
+                    # self._thread_pool.submit((link, level))
+                    new_task_list.append((link, level))
+        if new_task_list:
+            self._thread_pool.batch_submit(new_task_list)
 
     def has_finished(self):
         """
@@ -209,4 +216,12 @@ class Spider:
         :param r:
         :return:
         """
+        # 因为实现上使用 CaseInsensitiveDict 对 Content-type 的大小写不敏感
         return r.headers.get('Content-Type', '')
+
+    def progress(self) -> tuple:
+        """
+        反馈进度消息
+        :return:
+        """
+        return self._thread_pool.progress()
