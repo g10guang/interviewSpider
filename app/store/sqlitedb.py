@@ -70,7 +70,7 @@ class SqliteStore:
         """
         result = self.c.execute('''SELECT name FROM sqlite_master WHERE name=? AND type="table"''', (self.table_name, ))
         if result.fetchall():
-            logging.debug('table {} exists')
+            logging.debug('table {} exists'.format(self.table_name))
         else:
             logging.debug('table {} not exists'.format(self.table_name))
             self.c.execute(

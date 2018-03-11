@@ -31,7 +31,7 @@ class Spider:
         self.analysed_url = dict()
         self.url_visiting = dict()
         self._mutex = threading.Lock()
-        self.dblock = threading.Lock()
+        self._dblock = threading.RLock()
         self.url_with_keyword = dict()
         self._thread_pool = ThreadPool(args.thread, fn=self.analyse)
         self._thread_pool.submit((base_url, 0))
@@ -64,14 +64,7 @@ class Spider:
             if 'text/html' in content_type:
                 has_key = self.has_keyword(response)
                 if has_key:
-                    try:
-                        self._mutex.acquire()
-                        self.url_with_keyword[url] = level
-                        logging.info('url {} with keyword={}'.format(url, self.keyword))
-                    except Exception as e:
-                        logging.error(e)
-                    finally:
-                        self._mutex.release()
+                    self.add_url_with_keyword(url, level)
 
                 links = self.extract_link(response)
                 if links:
@@ -201,12 +194,9 @@ class Spider:
         将 url 持久化到 sqlite db
         :return:
         """
-        try:
-            self.dblock.acquire()
+        with self._dblock:
             t = self.url_with_keyword
             self.url_with_keyword = dict()
-        finally:
-            self.dblock.release()
         urls = [(self.keyword, url) for url in t]
         self.db.batch_insert(urls)
 
@@ -225,3 +215,14 @@ class Spider:
         :return:
         """
         return self._thread_pool.progress()
+
+    def add_url_with_keyword(self, url, level):
+        """
+        发现页面包含关键字的 url
+        :param url:
+        :param level:
+        :return:
+        """
+        with self._dblock:
+            self.url_with_keyword[url] = level
+        logging.info('url {} with keyword={}'.format(url, self.keyword))

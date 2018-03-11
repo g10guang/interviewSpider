@@ -13,7 +13,7 @@ class ThreadPool:
     线程池
     """
 
-    def __init__(self, worker_num: int, fn, queue_size: int = 10000):
+    def __init__(self, worker_num: int, fn, queue_size: int = 1000):
         # 任务队列
         self.workers = worker_num
         self.fn = fn

@@ -4,9 +4,9 @@
 # 2018-03-09 23:44
 
 import unittest
+
 from app.parseargs import parse
 from app.utils import sysargs
-import re
 
 
 class TestParseArgs(unittest.TestCase):
@@ -17,20 +17,21 @@ class TestParseArgs(unittest.TestCase):
         self.args = parser.get_args()
 
     def test_url(self):
-        print(self.args.url)
+        assert self.args.url == 'http://g10guang.com'
 
     def test_testself(self):
-        print(self.args.testself)
+        assert self.args.logfile == './log.txt'
 
     def test_logfile(self):
-        print(self.args.logfile)
+        assert self.args.loglevel == 1
 
     def test_loglevel(self):
-        print(self.args.loglevel)
+        assert self.args.thread == 3
 
     def test_dbfile(self):
-        print(self.args.dbfile)
+        assert self.args.dbfile == './spider.db'
 
     def test_keyword(self):
-        print(self.args.keyword)
+        # print(self.args.keyword)
+        assert self.args.keyword == '"hello"'
 
