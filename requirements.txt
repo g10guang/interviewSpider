@@ -13,6 +13,6 @@ pyquery==1.4.0
 requests==2.18.4
 requests-html==0.8.1
 six==1.11.0
-urllib3==1.22
+urllib3==1.24.2
 w3lib==1.19.0
 websockets==4.0.1
